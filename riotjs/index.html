@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Article Management</title>
+  <!-- Bootstrap core CSS-->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom fonts for this template-->
+  <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this template-->
+  <link href="/css/sb-admin.css" rel="stylesheet">
+  </head>
+  <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+    <div class="loading" id="loading">Loading&#8230;</div>
+    <div id="snackbar">Some text some message..</div>
+    <div class="fixed-nav container-fluid">
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-table"></i> List Articles</div>
+        <div class="card-body">
+          <article-apps></article-apps>
+        </div>
+      </div>
+    </div>
+    <script src="/bower_components/riot/riot.min.js"></script>
+    <script src="/bower_components/axios/dist/axios.min.js"></script>
+    <script src="/tags/all.js"></script>
+    <script>
+      riot.mount('article-apps', {callback:loadPage});
+
+      function loadPage(listPage, page='', search='', order='') {
+        var loading = document.getElementById('loading');
+        var params = []
+
+        loading.style.display = '';
+        if (page != '') {
+          params.push('page='+page+'&')
+        }
+        if (search!='') {
+          params.push('search='+search)
+        }
+        if (order!='') {
+          if (order == 'create_date') {
+            order = 'created_at'
+          }
+          params.push('order_by='+order)
+        }
+        var new_params = params.join('&')
+        axios.get('http://ivosights.dev:3333/articles?'+new_params)
+        .then(function(response){
+          if (response.status == 200) {
+            var articles = response.data;
+            listPage.trigger('data_loader', articles);
+            loading.style.display = 'none';
+          }
+        });  
+      }
+    </script>
+  </body>
+
+</html>
